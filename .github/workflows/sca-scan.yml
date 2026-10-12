@@ -1,8 +1,29 @@
 name: SCA Scan
 
 # Pilot caller on the fork: manual runs only, the schedule is added when rolled out upstream.
+# What the run is, for the list of runs: a full manual run or a partial one
+run-name: >-
+  SCA Scan · ${{ github.event_name != 'workflow_dispatch' && 'scheduled'
+  || inputs.targets != '' && format('manual: {0}', inputs.targets)
+  || (!inputs.scan-images || !inputs.scan-source || !inputs.osv-enabled) && 'manual · partial'
+  || 'manual · full' }}
+
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Only these targets (comma-separated ids or patterns such as source-*); empty means all"
+        type: string
+        default: ""
+      scan-images:
+        type: boolean
+        default: true
+      scan-source:
+        type: boolean
+        default: true
+      osv-enabled:
+        type: boolean
+        default: true
 
 concurrency:
   group: sca-scan
@@ -11,6 +32,7 @@ concurrency:
 permissions:
   contents: read
   packages: read
+  actions: read
 
 jobs:
   sca:
@@ -21,3 +43,8 @@ jobs:
       images: |
         epam/statgpt-sdmx-proxy
         epam/statgpt-sdmx-proxy-config-server
+      # The `inputs` context is empty on a schedule: the values for it are explicit
+      targets: ${{ inputs.targets || '' }}
+      scan-images: ${{ github.event_name != 'workflow_dispatch' || inputs.scan-images }}
+      scan-source: ${{ github.event_name != 'workflow_dispatch' || inputs.scan-source }}
+      osv-enabled: ${{ github.event_name != 'workflow_dispatch' || inputs.osv-enabled }}
