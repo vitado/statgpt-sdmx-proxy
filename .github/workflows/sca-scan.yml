@@ -1,0 +1,23 @@
+name: SCA Scan
+
+# Pilot caller on the fork: manual runs only, the schedule is added when rolled out upstream.
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: sca-scan
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  sca:
+    uses: vitado/ai-dial-ci/.github/workflows/sca_scheduled.yml@pilot/sca-scheduled
+    with:
+      repository: epam/statgpt-sdmx-proxy
+      java-version: "25"
+      images: |
+        epam/statgpt-sdmx-proxy
+        epam/statgpt-sdmx-proxy-config-server
