@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   sca:
-    uses: vitado/ai-dial-ci/.github/workflows/sca_scheduled.yml@pilot/sca-lean
+    uses: vitado/ai-dial-ci/.github/workflows/sca_scheduled.yml@pilot/sca-split
     with:
       repository: epam/statgpt-sdmx-proxy
       java-version: "25"
