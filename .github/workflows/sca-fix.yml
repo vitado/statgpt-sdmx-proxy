@@ -1,0 +1,35 @@
+name: SCA fix
+
+# W4 test bed: dispatch only. Remove in P6 together with the w4test-* branches.
+
+on:
+  workflow_dispatch:
+    inputs:
+      report-run-ids:
+        description: Comma-separated ids of runs whose sca-report artifact feeds the planner
+        required: true
+      config:
+        description: Planner configuration (JSON)
+        default: "{}"
+      dry-run:
+        description: Plan, apply and rescan only, no push and no pull request
+        type: boolean
+        default: false
+
+jobs:
+  fix:
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+      packages: read
+    uses: vitado/ai-dial-ci/.github/workflows/sca_fix.yml@feat/sca-fix
+    with:
+      report-run-ids: ${{ inputs.report-run-ids }}
+      config: ${{ inputs.config }}
+      dry-run: ${{ inputs.dry-run }}
+      app-client-id: ${{ vars.SCA_FIX_APP_CLIENT_ID }}
+    secrets:
+      app-private-key: ${{ secrets.SCA_FIX_APP_PRIVATE_KEY }}
+
+
