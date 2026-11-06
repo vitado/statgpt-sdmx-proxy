@@ -16,12 +16,17 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: sca-fix
+  cancel-in-progress: false
+
 jobs:
   fix:
     permissions:
       contents: write
       pull-requests: write
       actions: read
+      statuses: read
       packages: read
     uses: vitado/ai-dial-ci/.github/workflows/sca_fix.yml@feat/sca-fix
     with:
