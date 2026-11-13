@@ -1,8 +1,11 @@
 name: SCA fix
 
-# W4 test bed: dispatch only. Remove in P6 together with the w4test-* branches.
+# Soak: runs after a scheduled "SCA Scan" (real runs, PRs on the fork) and on manual dispatch. Remove in P6 together with the w4test-* branches.
 
 on:
+  workflow_run:
+    workflows: ["SCA Scan"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       report-run-ids:
@@ -22,6 +25,7 @@ concurrency:
 
 jobs:
   fix:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'schedule')
     permissions:
       contents: write
       pull-requests: write
@@ -30,9 +34,9 @@ jobs:
       packages: read
     uses: vitado/ai-dial-ci/.github/workflows/sca_fix.yml@feat/sca-fix
     with:
-      report-run-ids: ${{ inputs.report-run-ids }}
-      config: ${{ inputs.config }}
-      dry-run: ${{ inputs.dry-run }}
+      report-run-ids: ${{ inputs.report-run-ids || github.event.workflow_run.id }}
+      config: ${{ inputs.config || '{}' }}
+      dry-run: ${{ inputs.dry-run || false }}
       app-client-id: ${{ vars.SCA_FIX_APP_CLIENT_ID }}
     secrets:
       app-private-key: ${{ secrets.SCA_FIX_APP_PRIVATE_KEY }}
