@@ -27,8 +27,7 @@ jobs:
   fix:
     if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'schedule')
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
       actions: read
       statuses: read
       packages: read
